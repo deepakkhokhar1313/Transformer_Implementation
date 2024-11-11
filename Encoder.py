@@ -5,9 +5,9 @@ import MultiHeadAttention
 import PositionalEmbedding
 import WordEmbedding
 
-class Encoder(nn.Module):
+class EncoderBlock(nn.Module):
     def __init__(self, embed_dim, expansion_factor=4, n_heads = 8):
-        super(Encoder, self).__init__()
+        super(EncoderBlock, self).__init__()
 
         self.attention = MultiHeadAttention(embed_dim,n_heads)
         self.norm1 = nn.LayerNorm(embed_dim)
@@ -39,7 +39,7 @@ class TransformerEncoder(nn.Module):
         self.word_embedding = WordEmbedding(vocab_size,embed_dim)
         self.positional_embedding = PositionalEmbedding(seq_len, embed_dim)
 
-        self.layers = nn.ModuleList([Encoder(embed_dim=embed_dim, 
+        self.layers = nn.ModuleList([EncoderBlock(embed_dim=embed_dim, 
                                              expansion_factor=expansion_factor,
                                              n_heads=n_head) for i in range(num_layers)])
 
