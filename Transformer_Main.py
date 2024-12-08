@@ -4,9 +4,11 @@ import torch.nn as nn
 from Decoder import TransformerDecoder
 from Encoder import TransformerEncoder
 
+
 class Transformer(nn.Module):
     def __init__(self, embed_dim, src_vocab_size, target_vocab_size, seq_len, 
                  num_layers = 2, expansion_fact=4, n_head = 8):
+        super(Transformer, self).__init__()
         self.target_vocab_size = target_vocab_size
         self.encoder = TransformerEncoder(seq_len,src_vocab_size,
                                           embed_dim, num_layers, expansion_fact,
@@ -20,7 +22,6 @@ class Transformer(nn.Module):
         target_mask = torch.tril(torch.ones((target_seq_len,target_seq_len))).expand(
             batch_size,1,target_seq_len,target_seq_len
         )
-
         return target_mask
     
     def forward(self, src, target):
@@ -40,7 +41,7 @@ class Transformer(nn.Module):
         out = target
 
         for i in range(seq_len):
-            out = self.decode(out, encoder_out,target_mask)
+            out = self.decoder(out, encoder_out,target_mask)
             out = out[:,-1,:]
 
             out = out.argmax(-1)

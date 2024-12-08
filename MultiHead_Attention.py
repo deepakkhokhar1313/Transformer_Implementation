@@ -19,15 +19,15 @@ class MultiHeadAttention(nn.Module):
     def forward(self, key, query, value, mask = None):
         # key or query or value vector = (batch size, sequence length, embedding dimensions)
         batch_size = key.size(0) #let consider 32
-        seq_length = key.siz(1)  #let consider 10
+        seq_length = key.size(1)  #let consider 10
         # query dimension can change in decoder during inference.
         # so we cant take general seq_length
         seq_length_query = query.size(1)
-
+        
         # so now vector shape = (32*10*512)
-        key = key.view(batch_size, seq_length, self.n_head,self.single_head_dim) #(32*10*8*64)
-        query = query.view(batch_size, seq_length_query, self.n_head,self.single_head_dim)
-        value = value.view(batch_size, seq_length, self.n_head,self.single_head_dim)
+        key = key.view(batch_size, self.n_head, seq_length, self.single_head_dim) #(32*10*8*64)
+        query = query.view(batch_size, self.n_head, seq_length_query, self.single_head_dim)
+        value = value.view(batch_size, self.n_head, seq_length, self.single_head_dim)
 
         k = self.key_mat(key)
         q = self.query_mat(query)
@@ -36,9 +36,12 @@ class MultiHeadAttention(nn.Module):
         # transpose of k
         K_trans = k.transpose(-1,-2)
 
+
         product = torch.matmul(q, K_trans)
+
         # fill those positions of product matrix as (-1e20) where mask positions are 0
         if mask is not None:
+             print("mask shape ",mask.shape)
              product = product.masked_fill(mask == 0, float("-1e20"))
         
         # Scalling by sqrt(dk)

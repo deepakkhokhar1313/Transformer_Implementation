@@ -1,9 +1,11 @@
 import torch
 import torch.nn as nn
 
-import MultiHeadAttention
-import PositionalEmbedding
-import WordEmbedding
+from MultiHead_Attention import MultiHeadAttention
+from Positional_Embedding import PositionalEmbedding
+from Word_Embedding import WordEmbedding
+
+
 
 class EncoderBlock(nn.Module):
     def __init__(self, embed_dim, expansion_factor=4, n_heads = 8):

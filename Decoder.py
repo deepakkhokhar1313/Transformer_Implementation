@@ -3,9 +3,10 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from Encoder import EncoderBlock
-import MultiHeadAttention
-import PositionalEmbedding
-import WordEmbedding
+from MultiHead_Attention import MultiHeadAttention
+from Positional_Embedding import PositionalEmbedding
+from Word_Embedding import WordEmbedding
+
 
 class DecoderBlock(nn.Module):
     def __init__(self, embed_dim, expansion_fact= 4,n_head= 8):
