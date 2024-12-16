@@ -14,7 +14,7 @@ class PositionalEmbedding(nn.Module):
                 # this loop willupdate values for 
                 # each dimension of vector
                 pe[pos, i] = math.sin(pos/(10000 **((2 * i)/self.embed_dim)))
-                pe[pos, i + 1] = math.sin(pos/(10000 **((2 * (i + 1))/self.embed_dim)))
+                pe[pos, i + 1] = math.cos(pos/(10000 **((2 * (i + 1))/self.embed_dim)))
         
         # it add one extra dimension for batch size 
         # at later stage

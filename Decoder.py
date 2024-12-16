@@ -12,7 +12,7 @@ class DecoderBlock(nn.Module):
     def __init__(self, embed_dim, expansion_fact= 4,n_head= 8):
         super(DecoderBlock, self).__init__()
 
-        self.attention = MultiHeadAttention(embed_dim,n_head=8)
+        self.attention = MultiHeadAttention(embed_dim,n_head)
         self.norm = nn.LayerNorm(embed_dim)
         self.dropout = nn.Dropout(0.2)
 
@@ -22,8 +22,8 @@ class DecoderBlock(nn.Module):
 
         attention = self.attention(query, query,query,mask)
         query = self.dropout(self.norm(attention + query))
-
-        out = self.encoder_block(key, query, value)
+        # print("In decoder block attention and query shape = ", attention.shape, query.shape, key.shape, value.shape)
+        out = self.encoder_block(key, query, value, is_called_from_decoder = 1)
 
         return out
 
@@ -45,11 +45,12 @@ class TransformerDecoder(nn.Module):
         word_emd_out = self.word_embedding(x)
         positional_emd_out = self.positional_embedding(word_emd_out)
 
+        # print("In Decoder Block Word_emb_out, positional_emd_out shape are = ", word_emd_out.shape, positional_emd_out.shape)
         decoder_out = self.dropout(positional_emd_out)
 
         for layer in self.layers:
             decoder_out = layer(encoder_out, decoder_out, encoder_out, mask)
 
-        out = F.softmax(self.fc_out(decoder_out))
+        out = F.softmax(self.fc_out(decoder_out), dim=-1)
         
         return out

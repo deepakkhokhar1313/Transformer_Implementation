@@ -17,6 +17,7 @@ class MultiHeadAttention(nn.Module):
         self.out = nn.Linear(self.n_head * self.single_head_dim, self.embed_dim)
 
     def forward(self, key, query, value, mask = None):
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         # key or query or value vector = (batch size, sequence length, embedding dimensions)
         batch_size = key.size(0) #let consider 32
         seq_length = key.size(1)  #let consider 10
@@ -24,6 +25,9 @@ class MultiHeadAttention(nn.Module):
         # so we cant take general seq_length
         seq_length_query = query.size(1)
         
+        # print("key shape ini multihead attention = ",key.shape)
+        # print("query shape ini multihead attention = ",query.shape)
+        # print("value shape ini multihead attention = ",value.shape)
         # so now vector shape = (32*10*512)
         key = key.view(batch_size, self.n_head, seq_length, self.single_head_dim) #(32*10*8*64)
         query = query.view(batch_size, self.n_head, seq_length_query, self.single_head_dim)
@@ -38,11 +42,14 @@ class MultiHeadAttention(nn.Module):
 
 
         product = torch.matmul(q, K_trans)
-
+        
         # fill those positions of product matrix as (-1e20) where mask positions are 0
         if mask is not None:
-             print("mask shape ",mask.shape)
+             mask = mask.to(device)
+            #  print("Product shape in muli ead attention = ", product.shape, mask.shape)
+            #  print("mask shape ",mask.shape)
              product = product.masked_fill(mask == 0, float("-1e20"))
+        
         
         # Scalling by sqrt(dk)
         product = product / math.sqrt(self.single_head_dim)

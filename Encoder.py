@@ -24,9 +24,13 @@ class EncoderBlock(nn.Module):
         self.dropout1 =nn.Dropout(0.2)
         self.dropout2 =nn.Dropout(0.2)
     
-    def forward(self, key, query, value):
+    def forward(self, key, query, value, is_called_from_decoder = False):
         attention_out = self.attention(key, query, value)
-        attention_residual_out = attention_out + value
+        # print("attention_out and value in encoder block = ",attention_out.shape, value.shape, key.shape, query.shape)
+        if is_called_from_decoder:
+            attention_residual_out = attention_out + query
+        else:
+            attention_residual_out = attention_out + value
         norm1_out = self.dropout1(self.norm1(attention_residual_out))
 
         feed_forward_out = self.feed_forward(norm1_out)
@@ -49,7 +53,9 @@ class TransformerEncoder(nn.Module):
         embed_out = self.word_embedding(x)
         out = self.positional_embedding(embed_out)
 
+        
         for layer in self.layers:
+            # print("embed_out in Transformer Encoder = ",embed_out.shape, out.shape)
             out = layer(out, out, out)
         
         return out
