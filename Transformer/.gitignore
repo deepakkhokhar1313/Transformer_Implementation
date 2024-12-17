@@ -1,0 +1,5 @@
+/data
+/training.log
+/tokenizer.model
+/tokenizer.vocab
+/trained_model.pth
